@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!--1.将服务放到dubbox上去-->
+    <!--下面的端口代表发布在zookeeper注册中心中的服务占有的端口号，默认为20880，如果有多个服务，则不能重复
+        其中的name属性代表协议的名称
+    -->
+    <dubbo:protocol port="20881" name="dubbo"/>
+    <!--下面这句代表指定服务的名称-->
+    <dubbo:application name="pinyougou_sellergoods_service"/>
+    <!--下面这句指示了服务发布到的zookeeper这个注册中心的地址-->
+    <dubbo:registry address="zookeeper://192.168.25.131:2181"/>
+    <!--下面这句代表将把指定包中的包有服务都发布到注册中心中去-->
+    <dubbo:annotation package="com.pinyougou.sellergoods.service"/>
+
+</beans>
