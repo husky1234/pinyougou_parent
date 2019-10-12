@@ -13,7 +13,23 @@ app.service('goodsService',function($http){
 		return $http.get("/goods/getTemplateInfo.do?id="+templateId);
 	}
 	this.getspecs = (ids)=>{
-
 		return $http.get("/goods/getspecs.do?ids="+ids);
+	}
+	this.getCategory = () => {
+		return $http.get("/goods/addCategoryList.do");
+	}
+	this.getLevelAllInfo =()=>{
+		return $http.get("/goods/getLevelAllInfo.do");
+	}
+	this.uploadFile = ()=>{
+		var data = new FormData();
+		data.append("file",file.files[0]);
+		return $http({
+			url:'../upload.do',
+			data:data,
+			method:'post',
+			headers:{'Content-Type':undefined},
+			transformRequest:angular.identity
+		})
 	}
 });

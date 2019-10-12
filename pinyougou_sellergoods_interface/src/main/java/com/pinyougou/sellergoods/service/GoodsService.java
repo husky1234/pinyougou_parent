@@ -23,4 +23,8 @@ public interface GoodsService {
     TbTypeTemplate getTemplateInfo(long id);
 
     List getspecs(long[] ids);
+
+    List addCategoryList();
+
+    List getLevelAllInfo();
 }

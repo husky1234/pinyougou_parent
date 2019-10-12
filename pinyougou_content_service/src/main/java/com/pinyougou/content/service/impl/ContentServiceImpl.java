@@ -1,0 +1,149 @@
+package com.pinyougou.content.service.impl;
+
+import com.alibaba.dubbo.config.annotation.Service;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.pinyougou.content.service.ContentService;
+import com.pinyougou.mapper.TbContentMapper;
+import com.pinyougou.pojo.PageResult;
+import com.pinyougou.pojo.Result;
+import com.pinyougou.pojo.TbContent;
+import com.pinyougou.pojo.TbContentExample;
+import com.pinyougou.pojo.TbContentExample.Criteria;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+
+import java.util.List;
+
+
+/**
+ * 服务实现层
+ * @author Administrator
+ *
+ */
+@Service
+public class ContentServiceImpl implements ContentService {
+	@Autowired
+	private RedisTemplate redisTemplate;
+	@Autowired
+	private TbContentMapper contentMapper;
+	
+	/**
+	 * 查询全部
+	 */
+	@Override
+	public List<TbContent> findAll() {
+		return contentMapper.selectByExample(null);
+	}
+
+	/**
+	 * 按分页查询
+	 */
+	@Override
+	public PageResult findPage(int pageNum, int pageSize) {
+		PageHelper.startPage(pageNum, pageSize);		
+		Page<TbContent> page=   (Page<TbContent>) contentMapper.selectByExample(null);
+		return new PageResult(page.getTotal(), page.getResult());
+	}
+
+	/**
+	 * 增加
+	 */
+	@Override
+	public Result add(TbContent content) {
+		try {
+			contentMapper.insert(content);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Result(false,"添加失败！");
+		}
+		//1.清空缓存数据
+		redisTemplate.boundHashOps("contentList").delete(content.getCategoryId());
+		return new Result(true,"增加成功！");
+	}
+	/**
+	 * 修改
+	 */
+	@Override
+	public void update(TbContent content){
+		contentMapper.updateByPrimaryKey(content);
+		//1.将原来的广告清空
+		redisTemplate.boundHashOps("contentList").delete(content.getCategoryId());
+		//1.1)得到原来的分类id
+		Long categoryId = contentMapper.selectByPrimaryKey(content.getId()).getCategoryId();
+		//2.比较一下现在的分类与原来的分类id是否相等
+		if(categoryId.longValue() != content.getCategoryId().longValue()){
+			//如果不相等就从缓存中清空
+			redisTemplate.boundHashOps("contentList").delete(categoryId);
+		}
+	}	
+	
+	/**
+	 * 根据ID获取实体
+	 * @param id
+	 * @return
+	 */
+	@Override
+	public TbContent findOne(Long id){
+		return contentMapper.selectByPrimaryKey(id);
+	}
+
+	/**
+	 * 批量删除
+	 */
+	@Override
+	public void delete(Long[] ids) {
+		for(Long id:ids){
+			//清空缓存
+			Long categoryId = contentMapper.selectByPrimaryKey(id).getCategoryId();
+			redisTemplate.boundHashOps("contentList").delete(categoryId);
+			contentMapper.deleteByPrimaryKey(id);
+		}		
+	}
+	
+	
+		@Override
+	public PageResult findPage(TbContent content, int pageNum, int pageSize) {
+		PageHelper.startPage(pageNum, pageSize);
+		
+		TbContentExample example=new TbContentExample();
+		Criteria criteria = example.createCriteria();
+		
+		if(content!=null){			
+						if(content.getTitle()!=null && content.getTitle().length()>0){
+				criteria.andTitleLike("%"+content.getTitle()+"%");
+			}
+			if(content.getUrl()!=null && content.getUrl().length()>0){
+				criteria.andUrlLike("%"+content.getUrl()+"%");
+			}
+			if(content.getPic()!=null && content.getPic().length()>0){
+				criteria.andPicLike("%"+content.getPic()+"%");
+			}
+			if(content.getStatus()!=null && content.getStatus().length()>0){
+				criteria.andStatusLike("%"+content.getStatus()+"%");
+			}
+	
+		}
+		
+		Page<TbContent> page= (Page<TbContent>)contentMapper.selectByExample(example);
+		return new PageResult(page.getTotal(), page.getResult());
+	}
+	//根据分类id查询广告列表
+	@Override
+	public List<TbContent> findContentByCategoryId(long categoryId) {
+		//1.从redis中取出数据，如果没有再从数据库中取，并且同时放到redis中去
+		List<TbContent> contentList = (List<TbContent>) redisTemplate.boundHashOps("contentList").get(categoryId);
+		//2.判断是否为null
+		if(contentList == null){
+			TbContentExample example = new TbContentExample();
+			Criteria criteria = example.createCriteria();
+			criteria.andCategoryIdEqualTo(categoryId);
+			System.out.println("正在从数据库中取数据(第一次)...");
+			contentList = contentMapper.selectByExample(example);
+			//3.将查询出来的数据放到redis中
+			redisTemplate.boundHashOps("contentList").put(categoryId,contentList);
+		}
+		return contentList;
+	}
+
+}

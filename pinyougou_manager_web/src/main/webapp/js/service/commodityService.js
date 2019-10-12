@@ -8,4 +8,10 @@ app.service("commodityService",function ($http) {
     this.deletcommodify = (list)=>{
         return $http.get("/category/deleInfo.do?list="+list);
     }
+    this.getCategory = (i) => {
+        return $http.get("/goods/addCategoryList.do");
+    }
+    this.getLevelAllInfo =()=>{
+        return $http.get("/goods/getLevelAllInfo.do");
+    }
 })

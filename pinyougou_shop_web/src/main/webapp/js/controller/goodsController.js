@@ -80,7 +80,7 @@ app.controller('goodsController', function ($scope, $controller, goodsService) {
         }
         return returnValue;
     }
-    $scope.entity = {goods: {}, goodsDesc: {itemImages: [], specificationItems: []},items:[]};
+    $scope.entity = {goods: {}, goodsDesc: {itemImages: [], specificationItems: []}, items: []};
     $scope.updateSelect = (event, specName, optionName) => {
         let obj = null;
         for (let i = 0; i < $scope.entity.goodsDesc.specificationItems.length; i++) {
@@ -88,32 +88,85 @@ app.controller('goodsController', function ($scope, $controller, goodsService) {
                 obj = $scope.entity.goodsDesc.specificationItems[i]
             }
         }
-            if (event.target.checked) {
-                if (obj != null) {
-                    obj.attributeValue.push(optionName);
-                } else {
-                    $scope.entity.goodsDesc.specificationItems.push({
-                        attributeName: specName,
-                        attributeValue: [optionName]
-                    })
-                }
+        if (event.target.checked) {
+            if (obj != null) {
+                obj.attributeValue.push(optionName);
             } else {
-                if (obj != null) {
-                    let index = obj.attributeValue.indexOf(optionName);
-                    obj.attributeValue.splice(index, 1);
+                $scope.entity.goodsDesc.specificationItems.push({
+                    attributeName: specName,
+                    attributeValue: [optionName]
+                })
+            }
+        } else {
+            if (obj != null) {
+                let index = obj.attributeValue.indexOf(optionName);
+                obj.attributeValue.splice(index, 1);
+            }
+        }
+        createSkuList();
+    }
+    //生成sku列表
+    createSkuList = () => {
+        //1.对sku商品列表进行初始化
+        $scope.entity.items = [{spec: {}, price: 0, num: 99999, status: '0', isDefault: '0'}]
+        //2.得到$scope.entity.goodsDesc.specificationItems中的数据
+        var items = $scope.entity.goodsDesc.specificationItems;
+        //3.遍历此集合, 对$scope.entity.items进行动态赋值
+        for (let i = 0; i < items.length; i++) {
+            $scope.entity.items = addColumn($scope.entity.items, items[i].attributeName, items[i].attributeValue);
+        }
+    }
+    addColumn = (list, attributeName, attributeValue) => {
+        //1.定义一个新集合，用于存放最终的数据
+        let newList = [];
+        //2.遍历list集合
+        for (let i = 0; i < list.length; i++) {
+            //2.1)得到原始数据行
+            let oldRow = list[i];
+            //2.2)遍历值的集合
+            for (let j = 0; j < attributeValue.length; j++) {
+                //2.3)深克隆得到新行数据
+                let newRow = JSON.parse(JSON.stringify(oldRow));
+                //2.4)为新行中的spec对象赋值
+                newRow.spec[attributeName] = attributeValue[j];
+                //2.5)将新行添加到新的集合newList中
+                newList.push(newRow);
+            }
+        }
+        //3.返回新的集合
+        return newList;
+    }
+    $scope.categorylist=[]
+    $scope.addCategoryList = () => {
+        goodsService.getCategory().success(response=>{
+            for(let i = 0; i<response.length;i++){
+                if(response[i].auditStatus==0){
+                 $scope.categorylist.push(response[i])
                 }
             }
-        //状态以及规格等设置
-        //一下设置取决于用户的规格选择，按照用户的选择来生成相应的设置项
-        let specs = $scope.entity.goodsDesc.specificationItems;
-            $scope.entity.items=[{}];
-            let len = $scope.entity.items.length;
-               for (let i = 0; i < specs.length; i++) {
-                   for (let j = 0; j < len; j++) {
-                       for (let k = 0; k<specs[i].attributeValue.length; k++){
-                       $scope.entity.items.push(JSON.parse(JSON.stringify(specs[i].attributeValue[k]+specs[i].attributeName)));
-                       }
-                   }
-           }
-        }
+        })
+    }
+    $scope.itemCatList=[];
+    $scope.getLevelAllInfo=()=>{
+        goodsService.getLevelAllInfo().success(response=>{
+            for(let i = 0; i<response.length; i++){
+                $scope.itemCatList[response[i].id] = response[i].name;
+            }
+        })
+    }
+    $scope.status=["未审核","己审核","审核未通过","己关闭"];
+    $scope.image_entity={"url":null,"color":null}
+    $scope.uploadFile = ()=>{
+        goodsService.uploadFile().success(response=>{
+            if (response.success){
+                $scope.image_entity.url=response.message;
+                alert($scope.image_entity.url)
+            } else {
+                alert(response.message);
+            }
+        })
+    }
+    $scope.saveToItemImages = ()=>{
+        $scope.entity.goodsDesc.itemImages.push($scope.image_entity);
+    }
 });	

@@ -1,5 +1,5 @@
-com\pinyougou\mapper\TbTypeTemplateMapper.class
 com\pinyougou\mapper\TbSeckillOrderMapper.class
+com\pinyougou\mapper\TbTypeTemplateMapper.class
 com\pinyougou\mapper\TbSpecificationMapper.class
 com\pinyougou\mapper\TbAreasMapper.class
 com\pinyougou\mapper\TbSeckillGoodsMapper.class
@@ -17,6 +17,6 @@ com\pinyougou\mapper\TbItemMapper.class
 com\pinyougou\mapper\TbSellerMapper.class
 com\pinyougou\mapper\TbBrandMapper.class
 com\pinyougou\mapper\TbGoodsDescMapper.class
-com\pinyougou\mapper\TbOrderItemMapper.class
 com\pinyougou\mapper\TbFreightTemplateMapper.class
+com\pinyougou\mapper\TbOrderItemMapper.class
 com\pinyougou\mapper\TbItemCatMapper.class

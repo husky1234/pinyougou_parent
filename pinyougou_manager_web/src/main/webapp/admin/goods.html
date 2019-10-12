@@ -14,32 +14,21 @@
     <link rel="stylesheet" href="../css/style.css">
 	<script src="../plugins/jQuery/jquery-2.2.3.min.js"></script>
     <script src="../plugins/bootstrap/js/bootstrap.min.js"></script>
-
 	<!--1.加载angularjs库-->
 	<script src="../plugins/angularjs/angular.min.js"></script>
-	<!--引入分页的样式-->
-	<link rel="stylesheet" href="../plugins/angularjs/pagination.css">
-	<!--引入分页的js库-->
-	<script src="../plugins/angularjs/pagination.js"></script>
 	<!--2.加载自定义的类库-->
-	<script src="../js/base_pagination.js"></script>
-	<script src="../js/service/goodsService.js"></script>
-	<script src="../js/service/brandService.js"></script>
-	<script src="../js/service/itemCatService.js"></script>
-	<script src="../js/service/typeTemplateService.js"></script>
+	<script src="../js/base.js"></script>
+	<script src="../js/service/commodityService.js"></script>
 	<!--3.引入baseController控制器-->
 	<script src="../js/controller/baseController.js"></script>
-	<script src="../js/controller/goodsController.js"></script>
- 
+	<script src="../js/controller/commodityController.js"></script>
 </head>
-
 <body class="hold-transition skin-red sidebar-mini"
-	  ng-app="pinyougou" ng-controller="goodsController"
-      ng-init="addCategoryList()">
+	  ng-app="pinyougou" ng-controller="commodityController"
+      ng-init="addCategoryList();getLevelAllInfo()">
   <!-- .box-body -->
-                
                     <div class="box-header with-border">
-                        <h3 class="box-title">商品管理</h3>
+                        <h3 class="box-title">商品审核</h3>
                     </div>
 
                     <div class="box-body">
@@ -53,7 +42,7 @@
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default" title="新建" ><i class="fa fa-file-o"></i> 新建</button>
                                         <button type="button" class="btn btn-default" title="删除" ><i class="fa fa-trash-o"></i> 删除</button>
-                                        <button type="button" class="btn btn-default" title="提交审核" ><i class="fa fa-check"></i> 提交审核</button>
+                                        <button type="button" class="btn btn-default" title="审核通过" ><i class="fa fa-check"></i> 提交审核</button>
                                         <button type="button" class="btn btn-default" title="屏蔽" onclick='confirm("你确认要屏蔽吗？")'><i class="fa fa-ban"></i> 屏蔽</button>
                                         <button type="button" class="btn btn-default" title="刷新" onclick="window.location.reload();"><i class="fa fa-refresh"></i> 刷新</button>
                                     </div>
@@ -112,9 +101,7 @@
 			                          </tr>
 			                      </tbody>
 			                  </table>
-			                  <!--数据列表/-->                        
-							  
-							 <tm-pagination conf="paginationConf"></tm-pagination>
+			                  <!--数据列表/-->
                         </div>
                         <!-- 数据表格 /-->
                         

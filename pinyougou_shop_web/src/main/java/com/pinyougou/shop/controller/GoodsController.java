@@ -42,4 +42,12 @@ public class GoodsController {
     List getspecs(long[] ids){
         return service.getspecs(ids);
     }
+    @RequestMapping("/addCategoryList")
+    List addCategoryList(){
+        return service.addCategoryList();
+    }
+    @RequestMapping("/getLevelAllInfo")
+    List getLevelAllInfo(){
+        return service.getLevelAllInfo();
+    }
 }

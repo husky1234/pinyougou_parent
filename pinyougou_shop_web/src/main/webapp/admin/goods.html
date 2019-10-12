@@ -17,16 +17,10 @@
 
 	<!--1.加载angularjs库-->
 	<script src="../plugins/angularjs/angular.min.js"></script>
-	<!--引入分页的样式-->
-	<link rel="stylesheet" href="../plugins/angularjs/pagination.css">
-	<!--引入分页的js库-->
-	<script src="../plugins/angularjs/pagination.js"></script>
+
 	<!--2.加载自定义的类库-->
-	<script src="../js/base_pagination.js"></script>
+	<script src="../js/base.js"></script>
 	<script src="../js/service/goodsService.js"></script>
-	<script src="../js/service/brandService.js"></script>
-	<script src="../js/service/itemCatService.js"></script>
-	<script src="../js/service/typeTemplateService.js"></script>
 	<!--3.引入baseController控制器-->
 	<script src="../js/controller/baseController.js"></script>
 	<script src="../js/controller/goodsController.js"></script>
@@ -35,7 +29,7 @@
 
 <body class="hold-transition skin-red sidebar-mini"
 	  ng-app="pinyougou" ng-controller="goodsController"
-      ng-init="addCategoryList()">
+      ng-init="addCategoryList();getLevelAllInfo()">
   <!-- .box-body -->
                 
                     <div class="box-header with-border">
@@ -92,7 +86,7 @@
 			                          </tr>
 			                      </thead>
 			                      <tbody>
-			                          <tr ng-repeat="goods in list">
+			                          <tr ng-repeat="goods in categorylist">
 			                              <td><input  type="checkbox"></td>			                              
 				                          <td>{{goods.id}}</td>
 									      <td>{{goods.goodsName}}</td>
@@ -112,9 +106,7 @@
 			                          </tr>
 			                      </tbody>
 			                  </table>
-			                  <!--数据列表/-->                        
-							  
-							 <tm-pagination conf="paginationConf"></tm-pagination>
+			                  <!--数据列表/-->
                         </div>
                         <!-- 数据表格 /-->
                         

@@ -1,16 +1,15 @@
 package com.pinyougou.sellergoods.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.pinyougou.group.Goods;
 import com.pinyougou.group.Specification;
 import com.pinyougou.mapper.*;
 import com.pinyougou.pojo.*;
 import com.pinyougou.sellergoods.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 
 @Service
@@ -30,6 +29,10 @@ public class GoodsServiceImpl implements GoodsService {
 	private TbSpecificationMapper tbSpecificationMapper;
 	@Autowired
 	private TbSpecificationOptionMapper tbSpecificationOptionMapper;
+	@Autowired
+	private  TbBrandMapper brandMapper;
+	@Autowired
+	private TbItemMapper itemMapper;
 
 
 	@Override
@@ -58,23 +61,32 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public Result addInfo(Goods goods) {
-		try {
-			goodsMapper.insert(goods.getGoods());
-			TbGoodsExample tbGoodsExample = new TbGoodsExample();
-			TbGoodsExample.Criteria criteria = tbGoodsExample.createCriteria();
-			tbGoodsExample.setOrderByClause("id desc");
-			criteria.andGoodsNameEqualTo(goods.getGoods().getGoodsName());
-			List<TbGoods> tbGoods = goodsMapper.selectByExample(tbGoodsExample);
-			TbGoodsDesc goodsDesc = goods.getGoodsDesc();
-			goodsDesc.setGoodsId(tbGoods.get(0).getId());
-			goodsDescMapper.insert(goodsDesc);
-			List<TbItem> items = goods.getItems();
-			for (TbItem item : items) {
-				tbItemMapper.insert(item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new Result(false,"添加失败！");
+		goodsMapper.insert(goods.getGoods());
+		//2.向tbGoodsDesc表（spu商品描述表）中添加数据
+		//2.1)得到刚才添加的商品id并且赋值给goodsDesc表的主键
+		goods.getGoodsDesc().setGoodsId(goods.getGoods().getId());
+		//2.2）向tbGoodsDesc表中添加数据
+		goodsDescMapper.insert(goods.getGoodsDesc());
+
+		//3.向tb_item表中添加数据(sku商品表)...
+		//3.1)从组合对象中得到items集合
+		List<TbItem> items = goods.getItems();
+		//3.2)遍历此商品列表
+		for (TbItem item : items) {
+			//设置标题
+			item.setTitle(goods.getGoods().getGoodsName());
+			//设置商品id
+			item.setGoodsId(goods.getGoods().getId());
+			//设置三级分类id
+			item.setCategoryid(goods.getGoods().getCategory3Id());
+			//设置category名称
+            item.setCategory(tbItemCatMapper.selectByPrimaryKey(goods.getGoods().getCategory3Id()).getName());
+			item.setCreateTime(new Date());
+			item.setUpdateTime(new Date());
+			//设置品牌名称
+			TbBrand tbBrand = brandMapper.selectByPrimaryKey(goods.getGoods().getBrandId());
+			item.setBrand(tbBrand.getName());
+			itemMapper.insert(item);
 		}
 		return new Result(true,"添加成功！");
 	}
@@ -110,5 +122,16 @@ public class GoodsServiceImpl implements GoodsService {
 			list.add(specification);
 		}
 		return list;
+	}
+
+	@Override
+	public List addCategoryList() {
+		return goodsMapper.selectByExample(null);
+	}
+
+	@Override
+	public List getLevelAllInfo() {
+
+		return tbItemCatMapper.selectByExample(null);
 	}
 }
