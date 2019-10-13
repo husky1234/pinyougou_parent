@@ -15,7 +15,7 @@
     <!--下面这句代表指定服务的名称-->
     <dubbo:application name="pinyougou_sellergoods_service"/>
     <!--下面这句指示了服务发布到的zookeeper这个注册中心的地址-->
-    <dubbo:registry address="zookeeper://192.168.25.132:2181"/>
+    <dubbo:registry address="zookeeper://192.168.25.135:2181"/>
     <!--下面这句代表将把指定包中的包有服务都发布到注册中心中去-->
     <dubbo:annotation package="com.pinyougou.sellergoods.service"/>
 

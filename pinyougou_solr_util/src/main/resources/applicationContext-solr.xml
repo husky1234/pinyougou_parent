@@ -1,0 +1,14 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:solr="http://www.springframework.org/schema/data/solr"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/data/solr
+    http://www.springframework.org/schema/data/solr/spring-solr.xsd">
+    <!--配置服务位置-->
+    <solr:solr-server id="solrServer" url="http://localhost:8080/solr"/>
+    <!--配置sorl模板-->
+    <bean class="org.springframework.data.solr.core.SolrTemplate">
+        <constructor-arg ref="solrServer"/>
+    </bean>
+</beans>

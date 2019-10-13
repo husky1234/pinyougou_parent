@@ -28,6 +28,6 @@
     </bean>
     <!--3.为了访问zookeeper中的服务，需要做如下配置-->
     <dubbo:application name="pinyougou_manager_web"/>
-    <dubbo:registry address="zookeeper://192.168.25.132:2181"/>
+    <dubbo:registry address="zookeeper://192.168.25.135:2181"/>
     <dubbo:annotation package="com.pinyougou.manager.controller"/>
 </beans>

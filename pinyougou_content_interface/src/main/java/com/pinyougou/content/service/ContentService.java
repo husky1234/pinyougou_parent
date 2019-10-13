@@ -36,7 +36,7 @@ public interface ContentService {
 	/**
 	 * 修改
 	 */
-	public void update(TbContent content);
+	public Result update(TbContent content);
 	
 
 	/**
@@ -51,7 +51,7 @@ public interface ContentService {
 	 * 批量删除
 	 * @param ids
 	 */
-	public void delete(Long[] ids);
+	public Result delete(Long[] ids);
 
 	/**
 	 * 分页

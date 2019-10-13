@@ -31,4 +31,12 @@ public class ContenController {
     public Result save(@RequestBody TbContent tbContent){
         return  contentService.add(tbContent);
     }
+    @RequestMapping("/update")
+    public Result update(@RequestBody TbContent tbContent){
+        return contentService.update(tbContent);
+    }
+    @RequestMapping("/deleCategory")
+    public Result deleCategory(Long [] deleCategorys){
+        return contentService.delete(deleCategorys);
+    }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:duboo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+    <duboo:protocol port="20883" name="dubbo"/>
+    <duboo:application name="pinyougou_search_service"/>
+    <duboo:registry address="zookeeper://192.168.25.136:2181"/>
+    <duboo:annotation package="com.pinyougou.search.service.impl"/>
+</beans>

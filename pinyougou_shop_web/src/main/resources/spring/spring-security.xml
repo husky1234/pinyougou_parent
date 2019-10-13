@@ -61,7 +61,7 @@
     </beans:bean>
     <!-- 引用dubbo 服务 -->
     <dubbo:application name="pinyougou_shop_web" />
-    <dubbo:registry address="zookeeper://192.168.25.132:2181"/>
+    <dubbo:registry address="zookeeper://192.168.25.135:2181"/>
     <!--从dubbo中取出一个名为sellerService的服务-->
     <dubbo:reference interface="com.pinyougou.sellergoods.service.SellerService" id="sellerService"/>
 </beans:beans>

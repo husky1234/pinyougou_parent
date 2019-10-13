@@ -57,25 +57,21 @@ public class ContentServiceImpl implements ContentService {
 			e.printStackTrace();
 			return new Result(false,"添加失败！");
 		}
-		//1.清空缓存数据
-		redisTemplate.boundHashOps("contentList").delete(content.getCategoryId());
 		return new Result(true,"增加成功！");
 	}
 	/**
 	 * 修改
 	 */
 	@Override
-	public void update(TbContent content){
-		contentMapper.updateByPrimaryKey(content);
-		//1.将原来的广告清空
-		redisTemplate.boundHashOps("contentList").delete(content.getCategoryId());
-		//1.1)得到原来的分类id
-		Long categoryId = contentMapper.selectByPrimaryKey(content.getId()).getCategoryId();
-		//2.比较一下现在的分类与原来的分类id是否相等
-		if(categoryId.longValue() != content.getCategoryId().longValue()){
-			//如果不相等就从缓存中清空
-			redisTemplate.boundHashOps("contentList").delete(categoryId);
+	public Result update(TbContent content){
+		try {
+			contentMapper.updateByPrimaryKey(content);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Result(false,"修改失败！");
 		}
+
+		return new Result(true,"修改成功!");
 	}	
 	
 	/**
@@ -92,13 +88,16 @@ public class ContentServiceImpl implements ContentService {
 	 * 批量删除
 	 */
 	@Override
-	public void delete(Long[] ids) {
+	public Result delete(Long[] ids) {
 		for(Long id:ids){
-			//清空缓存
-			Long categoryId = contentMapper.selectByPrimaryKey(id).getCategoryId();
-			redisTemplate.boundHashOps("contentList").delete(categoryId);
-			contentMapper.deleteByPrimaryKey(id);
-		}		
+			try {
+				contentMapper.deleteByPrimaryKey(id);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new Result(false,"删除失败！");
+			}
+		}
+		return new Result(true,"删除成功！");
 	}
 	
 	
@@ -131,19 +130,18 @@ public class ContentServiceImpl implements ContentService {
 	//根据分类id查询广告列表
 	@Override
 	public List<TbContent> findContentByCategoryId(long categoryId) {
-		//1.从redis中取出数据，如果没有再从数据库中取，并且同时放到redis中去
-		List<TbContent> contentList = (List<TbContent>) redisTemplate.boundHashOps("contentList").get(categoryId);
-		//2.判断是否为null
-		if(contentList == null){
-			TbContentExample example = new TbContentExample();
-			Criteria criteria = example.createCriteria();
-			criteria.andCategoryIdEqualTo(categoryId);
-			System.out.println("正在从数据库中取数据(第一次)...");
-			contentList = contentMapper.selectByExample(example);
-			//3.将查询出来的数据放到redis中
-			redisTemplate.boundHashOps("contentList").put(categoryId,contentList);
+		List<TbContent> content = (List<TbContent>) redisTemplate.boundHashOps("content").get(categoryId);
+		if (content != null){
+			System.out.println("从redis中取数据。。。。");
+			return content;
 		}
-		return contentList;
+		TbContentExample tbContentExample = new TbContentExample();
+		TbContentExample.Criteria criteria = tbContentExample.createCriteria();
+		criteria.andCategoryIdEqualTo(categoryId);
+		List<TbContent> tbContents = contentMapper.selectByExample(tbContentExample);
+		redisTemplate.boundHashOps("content").put(categoryId,tbContents);
+		System.out.println("从数据库取数据放入到redis中");
+		return tbContents;
 	}
 
 }
